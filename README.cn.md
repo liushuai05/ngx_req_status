@@ -1,12 +1,9 @@
-Name
+名称
 ====
 
 ngx_req_status - Request status in nginx
 
-
-# [中文介绍](https://github.com/liushuai05/ngx_req_status/blob/master/README.cn.md) 
-
-Synopsis
+完整配置
 ========
 
     http {
@@ -26,44 +23,48 @@ Synopsis
         }
     }
 
-Directives
+
+
+配置说明
 ==========
+  * req_status_zone
+    syntax:  req_status_zone zone_name $variable memory_max_size
+    context: http
 
-req_status_zone
----------------
-**syntax:** *req_status_zone name string size*
+    定义统计类型, 内容及内存使用限制.
 
-**default:** *None*
+    如:
+    req_status_zone server_name $server_name 256k;
+    req_status_zone server_addr $server_addr 256k;
+    req_status server_name server_addr;
 
-**context:** *http*
+    variable 可以是组合, 比如 "$server_name,$server_addr"
 
-Define a request status zone.
-Requests are grouped by the value of string specified in the second paramter.
+  * req_status
+    syntax:  req_status zone_name1 [zone_name2]
+    context: http, server, location
 
-    req_status_zone server_addr "$server_addr:$server_port" 256k;
+    为 location 启用定义的 req_status_zone 统计, 外层的定义会被
+    内层继承, 除非内层在 req_status 中单独或者在某个 zone_name
+    前使用了 @
 
-req_status
-----------
-**syntax:** *req_status zone1[ zone2]*
+  * req_status_show
+    syntax:  req_status_show
+    context: location
 
-**default:** *None*
+    统计信息页面. 支持以下参数:
+    c: 统计信息重置
+    l: 数字使用原始格式显示
 
-**context:** *http, server, location*
+* 配置示例
 
-Enables request status in this location.
-You can specify as many zones as needed.
+http {
+  req_status_zone server_name $server_name 256k;
+  req_status_zone server_addr $server_addr 256k;
+  req_status server_name server_addr;
+}
 
-req_status_show
----------------
-**syntax:** *req_status_show on*
-
-**default:** *None*
-
-**context:** *location*
-
-Enables the request status handler in this location.
-For example:
-
+* 配置访问地址
     location /req-status {
         req_status_show on;
 
@@ -71,12 +72,14 @@ For example:
         allow 127.0.0.1;
         deny all;
     }
-   
-Then you can see the page by 
+    
+效果
+============
+然后你可以访问如下地址
     
     curl http://127.0.0.1/req-status
 
-It is plain text information like:
+输出结果是纯文本信息，如：
 
     zone_name       key     max_active      max_bw  traffic requests        active  bandwidth
     imgstore_appid  43    27      6M      63G     374063  0        0
@@ -90,7 +93,7 @@ It is plain text information like:
     server_name     dl.pinyin.sogou.com     913     312M    8930G   35345453        225     97M
     server_name     download.ie.sogou.com   964     275M    7462G   7979817 297     135M
 
-Installation
+安装
 ============
 
     wget "http://nginx.org/download/nginx-1.3.5.tar.gz"
@@ -105,10 +108,10 @@ Installation
     make -j2
     make install
 
-Patches
+补丁
 =======
 
-Choose patch file according to Nginx version:
+根据nginx版本选择补丁文件：
 
 ### write_filter-1.7.11.patch
 
@@ -127,20 +130,20 @@ Choose patch file according to Nginx version:
 * **1.1.x**
 * **1.0.x**
 
-Changes
+变化
 =======
 
-Authors
+作者
 =======
 
 - Lanshun Zhou *&lt;zls0424@gmail.com&gt;*
 
-Copyright & License
+版权和许可证
 ===================
 
-This README template is from agentzh (http://github.com/agentzh).
+我从[limit_req module]借了很多代码(http://nginx.org/en/docs/http/ngx_http_limit_req_module.html)nginx的。这部分代码的版权归igor sysoev所有。
 
-I borrowed a lot of codes from [limit_req module](http://nginx.org/en/docs/http/ngx_http_limit_req_module.html) of Nginx. This part of code is copyrighted by Igor Sysoev. 
+####  BSD license
 
 This module is licensed under the terms of the BSD license.
 
