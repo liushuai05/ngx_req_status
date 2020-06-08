@@ -4,7 +4,7 @@ Name
 ngx_req_status - Request status in nginx
 
 
-# [中文介绍](https://github.com/liushuai05/ngx_req_status/blob/master/README.cn.md) 
+## [中文介绍](https://github.com/liushuai05/ngx_req_status/blob/master/README.cn.md) 
 
 Synopsis
 ========
